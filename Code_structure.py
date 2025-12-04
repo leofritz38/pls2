@@ -4,7 +4,7 @@
 #
 #
 #
-#
+#   
 #### Define some distances
 # Goal : Having an extra file where different distance calculation are defined
 #
@@ -25,3 +25,8 @@
 #  
 #### Return a diagnostic
 # Stress / lack of something
+#
+#
+#
+#
+#
