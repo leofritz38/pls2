@@ -36,7 +36,7 @@ import distances
 #     else:
 #         raise TypeError("please enter either a str, a list or a self_define model of str as model to extract parameters from")
 
-def optimize_models(modname,dist,pseudo_ref):
+def optimize_models(modname,dist,rawdata):
     # Premier cas de figure, plusieurs modèles qui tournent
     if isinstance(modname,list):
         # On execute la fonction sur chaque modèle individuel puis on stock le tout dans un dico de la strcture suivante :
@@ -44,21 +44,22 @@ def optimize_models(modname,dist,pseudo_ref):
         # Si une seule distance alors le dictionnaire ne contient pas de section dist_name
         multi_mod_param_opti={}
         for single_model in modname:
-            multi_mod_param_opti[single_model]=optimize_models(single_model,dist,pseudo_ref)
+            multi_mod_param_opti[single_model]=optimize_models(single_model,dist,rawdata)
         return(multi_mod_param_opti)
     elif isinstance(dist,list):
         # On execute la fonction sur chaque modèle individuellement
         multi_dist_param_opti={}
         for single_dist in dist:
-            multi_dist_param_opti[single_dist]=optimize_models(modname,single_dist,pseudo_ref)
+            multi_dist_param_opti[single_dist]=optimize_models(modname,single_dist,rawdata)
         return(multi_dist_param_opti)
     elif isinstance(modname,str) and isinstance(dist,str):
         # On récupère la fonction de distance associé à la chaine de caractère
         current_dist=getattr(distances,dist)
         # On récupère le modèle associé à la chaine de caractère
         current_mod = getattr(models, modname)
-        # On charge les datas
-        reference_data=pseudo_ref
+        # On charge les datas 
+        ##### A MODIFIER CE N'EST QUE DES FAUSSES SIMULATION UNTIL NOW
+        reference_data=rawdata
         # On récupère la liste des paramètres à inférer (nom + nombre)
         list_param=inspect.signature(current_mod)
         to_opt=list(list_param.parameters.values())[1].default
@@ -68,7 +69,7 @@ def optimize_models(modname,dist,pseudo_ref):
         # Exctraction des données nécessaires
         # y_obs=reference_data["PAR"]
         # x_obs=reference_data["ETR"]
-        y_obs=pseudo_ref
+        y_obs=rawdata
         x_obs=[0,1,2,3]
         ### Exécuter l'optimisation et récupérer la distance
         res=minimize(current_dist,x0=prior,args=(current_mod,x_obs,y_obs))
@@ -97,14 +98,22 @@ def flatten_dist(dic,path=None):
                 flatten.update(sub_flatten)
 
             elif key=="minimal_dist":
-                flatten["_".join(path)]=dic["minimal_dist"]
+                flatten[",".join(path)]=dic["minimal_dist"]
     return(flatten)
 
 def get_best_prediction(dic):
-    paths=[key for key,value in dic.items()]
-    distances=[value for key,value in dic.items()]
-    best_prediction=paths[np.argmin(distances)]
-    return best_prediction
+    dic=flatten_dist(dic)
+    best_prediction_per_distance={}
+    for key,value in dic.items():
+        if key.split(",")[1] not in best_prediction_per_distance:
+            best_prediction_per_distance[key.split(",")[1]]=[key.split(",")[0],value]
+        elif value<best_prediction_per_distance[key.split(",")[1]][1]:
+            best_prediction_per_distance[key.split(",")[1]]=[key.split(",")[0],value]
+        else: 
+            pass
+
+    return best_prediction_per_distance
         
                 
 
+print(get_best_prediction(optimize_models(["Model1","Model2"],["least_square_distance","least_square_distance2"],models.Model1([0,1,2,3],[0.5,0.5]))))
