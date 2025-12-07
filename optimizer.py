@@ -62,7 +62,6 @@ def optimize_models(modname,dist,pseudo_ref):
         # On récupère la liste des paramètres à inférer (nom + nombre)
         list_param=inspect.signature(current_mod)
         to_opt=list(list_param.parameters.values())[1].default
-        print(to_opt)
         ### Definir la plage x, y et les paramètres à optimiser
         # Définition des valeurs de paramètres à priori
         prior=np.repeat(0.5, len(to_opt))
@@ -86,5 +85,26 @@ def optimize_models(modname,dist,pseudo_ref):
         raise TypeError("Either distances or models are not list of str or str")
 
 
-print(optimize_models(["Model1","Model2"],"least_square_distance",models.Model1([0,1,2,3],[0.5,0.5])))
+def flatten_dist(dic,path=None):
+    flatten={}
+    if path==None:
+        path=[]
+    if isinstance(dic,dict):
+        for key, values in dic.items():
+            if key!="optimized_parameters" and key!="minimal_dist":
+                new_path=path+[key]
+                sub_flatten=flatten_dist(values,new_path)
+                flatten.update(sub_flatten)
+
+            elif key=="minimal_dist":
+                flatten["_".join(path)]=dic["minimal_dist"]
+    return(flatten)
+
+def get_best_prediction(dic):
+    paths=[key for key,value in dic.items()]
+    distances=[value for key,value in dic.items()]
+    best_prediction=paths[np.argmin(distances)]
+    return best_prediction
+        
+                
 
