@@ -4,8 +4,12 @@ import distances
 import models
 import numpy
 
-def decision_making(raw_data,models,distances):
-    optimized_parameters=optimizer.optimize_models(models,distances,raw_data)
+def decision_making(raw_data,models,distances,merge_dist=False,merge_only=False,ponderation):
+    if merge_dist and not(merge_only):
+        distances.append(".".join(distances))
+    if merge_only:
+        distances=[".".join(distances)]
+    optimized_parameters=optimizer.optimize_models(models,distances,raw_data,ponderation)
     best_optimization_per_distance=optimizer.get_best_prediction(optimized_parameters)
     average_best_model=[value[0] for key,value in best_optimization_per_distance.items()]
     if np.all(average_best_model == average_best_model[0]):
