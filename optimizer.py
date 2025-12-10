@@ -36,7 +36,7 @@ import distances
 #     else:
 #         raise TypeError("please enter either a str, a list or a self_define model of str as model to extract parameters from")
 
-def optimize_models(modname,dist,rawdata):
+def optimize_models(modname,dist,rawdata,ponderation):
     # Premier cas de figure, plusieurs modèles qui tournent
     if isinstance(modname,list):
         # On execute la fonction sur chaque modèle individuel puis on stock le tout dans un dico de la strcture suivante :
@@ -44,15 +44,15 @@ def optimize_models(modname,dist,rawdata):
         # Si une seule distance alors le dictionnaire ne contient pas de section dist_name
         multi_mod_param_opti={}
         for single_model in modname:
-            multi_mod_param_opti[single_model]=optimize_models(single_model,dist,rawdata)
+            multi_mod_param_opti[single_model]=optimize_models(single_model,dist,rawdata,ponderation)
         return(multi_mod_param_opti)
     elif isinstance(dist,list):
         # On execute la fonction sur chaque modèle individuellement
         multi_dist_param_opti={}
         for single_dist in dist:
-            multi_dist_param_opti[single_dist]=optimize_models(modname,single_dist,rawdata)
-        return(multi_dist_param_opti)
-    elif isinstance(modname,str) and isinstance(dist,str):
+            multi_dist_param_opti[single_dist]=optimize_models(modname,single_dist,rawdata,ponderation)
+        return(multi_dist_param_opti)    
+    elif isinstance(modname,str) and isinstance(dist,str) and dist.split(".")[0]!="merge":
         # On récupère la fonction de distance associé à la chaine de caractère
         current_dist=getattr(distances,dist)
         # On récupère le modèle associé à la chaine de caractère
@@ -81,7 +81,36 @@ def optimize_models(modname,dist,rawdata):
         optim["optimized_parameters"]=final
         optim["minimal_dist"]=res.fun
         return optim
-
+    elif isinstance(modname,str) and isinstance(dist,str) and dist.split(".")[0]=="merge":
+        # On récupère la fonction de distance associé à la chaine de caractère
+        dist_to_merge=dist.split(".")[1:]
+        current_dist=getattr(distances,"merge_distance")
+        # On récupère le modèle associé à la chaine de caractère
+        current_mod = getattr(models, modname)
+        # On charge les datas 
+        ##### A MODIFIER CE N'EST QUE DES FAUSSES SIMULATION UNTIL NOW
+        reference_data=rawdata
+        # On récupère la liste des paramètres à inférer (nom + nombre)
+        list_param=inspect.signature(current_mod)
+        to_opt=list(list_param.parameters.values())[1].default
+        ### Definir la plage x, y et les paramètres à optimiser
+        # Définition des valeurs de paramètres à priori
+        prior=np.repeat(0.5, len(to_opt))
+        # Exctraction des données nécessaires
+        # y_obs=reference_data["PAR"]
+        # x_obs=reference_data["ETR"]
+        y_obs=rawdata
+        x_obs=[0,1,2,3]
+        ### Exécuter l'optimisation et récupérer la distance
+        res=minimize(current_dist,x0=prior,args=(current_mod,x_obs,y_obs,dist_to_merge,ponderation))
+        ### Récupérer les valeurs de paramètres optimisé.
+        final={}
+        for i in range(len(to_opt)):
+            final[to_opt[i]]=res.x[i]
+        optim={}
+        optim["optimized_parameters"]=final
+        optim["minimal_dist"]=res.fun
+        return optim
     else:
         raise TypeError("Either distances or models are not list of str or str")
 
@@ -115,5 +144,6 @@ def get_best_prediction(dic):
     return best_prediction_per_distance
         
                 
-
-print(get_best_prediction(optimize_models(["Model1","Model2"],["least_square_distance","least_square_distance2"],models.Model1([0,1,2,3],[0.5,0.5]))))
+a=optimize_models(["Model1","Model2","Model3","Model4"],["least_square_distance","least_square_distance2","merge.least_square_distance.least_square_distance2"],models.Model6([0,1,2,3],[0.5,0.5]),[0.5,0.5])
+print(a)
+print(get_best_prediction(a))
