@@ -102,7 +102,7 @@ def optimize_models(modname,dist,rawdata,ponderation):
         y_obs=rawdata
         x_obs=[0,1,2,3]
         ### Exécuter l'optimisation et récupérer la distance
-        res=minimize(current_dist,x0=prior,args=(current_mod,x_obs,y_obs,dist_to_merge,ponderation))
+        res=minimize(current_dist,x0=prior,args=(current_mod,rawdata,dist_to_merge,ponderation))
         ### Récupérer les valeurs de paramètres optimisé.
         final={}
         for i in range(len(to_opt)):
