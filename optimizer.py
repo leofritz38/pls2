@@ -65,14 +65,12 @@ def optimize_models(modname,dist,rawdata,ponderation):
         to_opt=list(list_param.parameters.values())[1].default
         ### Definir la plage x, y et les paramètres à optimiser
         # Définition des valeurs de paramètres à priori
-        prior=np.repeat(0.5, len(to_opt))
+        prior=generate_prior(to_opt)
         # Exctraction des données nécessaires
         # y_obs=reference_data["PAR"]
         # x_obs=reference_data["ETR"]
-        y_obs=rawdata
-        x_obs=[0,1,2,3]
         ### Exécuter l'optimisation et récupérer la distance
-        res=minimize(current_dist,x0=prior,args=(current_mod,x_obs,y_obs))
+        res=minimize(current_dist,x0=prior,args=(current_mod,rawdata))
         ### Récupérer les valeurs de paramètres optimisé.
         final={}
         for i in range(len(to_opt)):
@@ -95,14 +93,13 @@ def optimize_models(modname,dist,rawdata,ponderation):
         to_opt=list(list_param.parameters.values())[1].default
         ### Definir la plage x, y et les paramètres à optimiser
         # Définition des valeurs de paramètres à priori
-        prior=np.repeat(0.5, len(to_opt))
+        prior=generate_prior(to_opt)
+        bounds = [(1e-6, 2000),(1e-6, 10),(0.1, 5)]
         # Exctraction des données nécessaires
         # y_obs=reference_data["PAR"]
         # x_obs=reference_data["ETR"]
-        y_obs=rawdata
-        x_obs=[0,1,2,3]
         ### Exécuter l'optimisation et récupérer la distance
-        res=minimize(current_dist,x0=prior,args=(current_mod,rawdata,dist_to_merge,ponderation))
+        res=minimize(current_dist,x0=prior,args=(current_mod,rawdata,dist_to_merge,ponderation),bounds=bounds[0:len(to_opt)])
         ### Récupérer les valeurs de paramètres optimisé.
         final={}
         for i in range(len(to_opt)):
@@ -143,7 +140,10 @@ def get_best_prediction(dic):
 
     return best_prediction_per_distance
         
-                
-a=optimize_models(["Model1","Model2","Model3","Model4"],["least_square_distance","least_square_distance2","merge.least_square_distance.least_square_distance2"],models.Model6([0,1,2,3],[0.5,0.5]),[0.5,0.5])
-print(a)
-print(get_best_prediction(a))
+def generate_prior(parameter_name):
+    prior_dic={"ETR":40,"alpha":0.2,"m":1}
+    prior_list=[prior_dic[param] for param in parameter_name]
+    return prior_list          
+# a=optimize_models(["Model1","Model2","Model3","Model4"],["least_square_distance","least_square_distance2","merge.least_square_distance.least_square_distance2"],models.Model6([0,1,2,3],[0.5,0.5]),[0.5,0.5])
+# print(a)
+# print(get_best_prediction(a))
