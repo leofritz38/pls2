@@ -6,14 +6,14 @@ def least_square_distance_ETR(param,model,data):
     x=data["PAR"]
     y_ref=data["ETR"]
     y_pred=model(x,param)
-    dist=sum((y_ref-y_pred)**2)
+    dist=(1/len(y_pred))*sum((y_ref-y_pred)**2)
     return dist
-def least_square_distance2(param,model,data):
+def least_square_distance_median(param,model,data):
     # current_mod=getattr(models,model)
     x=data["PAR"]
     y_ref=data["ETR"]
     y_pred=model(x,param)
-    dist=sum((y_ref-y_pred)**2)
+    dist= np.median((y_ref - y_pred)**2)
     return dist
 def merge_distance(param,model,data,dist_to_merge,ponderation):
     if len(ponderation)!=len(dist_to_merge):
