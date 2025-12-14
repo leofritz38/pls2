@@ -1,4 +1,13 @@
 ##### The goal of this file is to define as many models as wanted to use for optimization
+### Modele structure type :
+## 1. Definition du modèle
+# Le modèle doit prendre en entrée une liste de valeur d'un paramètre connu (par exemple l'intensité lumineuse ou le temps)
+# Et une liste de paramètre à estimer (numérique). Il est nécessaire que le nom des paramètres soit défini sous
+# frome de liste de chaine de caractère dans les valeurs par défault puisque ces valeurs par défaut sont utilisées
+# afin de rendre optimizer généralisant.
+## 2. Déclaration des paramètres : les paramètres doivent être extrait de la liste de paramètre à estimer
+## 3. S'assurer que le vecteur de paramètre soit bien un objet numpy
+## 4. Calcule et renvoie de la distance
 import numpy as np 
 def Model1(E,param=["alpha","ETR"]):
     alpha=param[0]
