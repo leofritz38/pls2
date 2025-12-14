@@ -5,6 +5,7 @@ import models
 import numpy as np
 import pandas as pd
 
+
 def decision_making(data,models,distances,merge_dist=False,merge_only=False,ponderation=[0.5,0.5]):
     if merge_dist and not(merge_only):
         distances.append("merge."+".".join(distances))
