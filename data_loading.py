@@ -84,11 +84,14 @@ print(" give the data_file pathway with / not \ ")
 
 def file_downloader(file_name):
     data=pandas.read_csv(file_name, sep=";", decimal=".")
-#print(data.head(), "all the data files")
-    data_interst=data.loc[:,["PAR","ETR","rETR","F","Fm'","Y(II)"]] 
+    # print(data.head(), "all the data files")
+    data_interst=data.loc[:,["t in s","PAR","ETR","rETR","F","Fm'","Y(II)"]] 
     print(data_interst.head(),"only the data of interest")
     
     return (data_interst)
-file_nameT=argv[1]
-data_algea=file_downloader(file_name=file_nameT)
+
+
+# file_nameT=argv[1]
+# data_algea=file_downloader(file_name=file_nameT)
+
 
