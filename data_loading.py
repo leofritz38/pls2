@@ -50,14 +50,14 @@ def create_fig(Path,data_proportion,model_used,dist,figname):
            percent+=0.01
     for key,value in alpha.items():
         plt.title("alpha")
-        print(len(value))
-        plt.scatter(time_seq,value)
+        plt.scatter(time_seq,value,s=5)
         plt.savefig(figname+"alpha"+key+".png")
         plt.show()
 
     for key,value in ETRmax.items():
         plt.title(path[1])
-        plt.scatter(time_seq,value)
+        plt.ylim(0, 100) 
+        plt.scatter(time_seq,value,s=5)
         plt.savefig(figname+"ETRmax"+key+".png")
         plt.show()
 
