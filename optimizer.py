@@ -67,8 +67,6 @@ def optimize_models(modname,dist,rawdata,ponderation):
         # Définition des valeurs de paramètres à priori
         prior=generate_prior(to_opt)
         # Exctraction des données nécessaires
-        # y_obs=reference_data["PAR"]
-        # x_obs=reference_data["ETR"]
         ### Exécuter l'optimisation et récupérer la distance
         res=minimize(current_dist,x0=prior,args=(current_mod,rawdata))
         ### Récupérer les valeurs de paramètres optimisé.
@@ -140,6 +138,7 @@ def get_best_prediction(dic):
 
     return best_prediction_per_distance
         
+
 def generate_prior(parameter_name):
     prior_dic={"ETR":40,"alpha":0.2,"m":1}
     prior_list=[prior_dic[param] for param in parameter_name]
@@ -147,3 +146,4 @@ def generate_prior(parameter_name):
 # a=optimize_models(["Model1","Model2","Model3","Model4"],["least_square_distance","least_square_distance2","merge.least_square_distance.least_square_distance2"],models.Model6([0,1,2,3],[0.5,0.5]),[0.5,0.5])
 # print(a)
 # print(get_best_prediction(a))
+
