@@ -6,7 +6,7 @@ import numpy as np
 import pandas as pd
 
 
-def decision_making(data,models,distances,merge_dist=False,merge_only=False,ponderation=[0.5,0.5]):
+def Simulate(data,models,distances,merge_dist=False,merge_only=False,ponderation=[0.5,0.5]):
     if merge_dist and not(merge_only):
         distances.append("merge."+".".join(distances))
     if merge_only:
@@ -18,6 +18,46 @@ def decision_making(data,models,distances,merge_dist=False,merge_only=False,pond
     average_best_model=[value[0] for key,value in best_optimization_per_distance.items()]
     best_opt_param={",".join([key,value[0]]): optimized_parameters[value[0]][key]["optimized_parameters"] for key,value in best_optimization_per_distance.items()}
     return best_opt_param,best_optimization_per_distance
+def decision_making(tmax,data,models,distances,merge_dist=False,merge_only=False,ponderation=[0.5,0.5]):
+    state=0
+    time_since_recover=0
+    time_since_stress=0
+    t=0
+    while t<tmax and state!=2:
+        best_param,bestmodel=decision_making.Simulate(df.iloc[i-10:i],model_used,dist,merge_dist=merge_dist,merge_only=merge_only,ponderation=ponderation)
+        paths=[[key,value[0]] for key,value in bestmodel.items()]
+        # On parcours les différentes distances (toujours un modèle par distance)
+        for path in paths:
+            # On récupère les valeurs de paramètres et on simule des données sur la plage de mesure
+            key=",".join(path)
+            full_param=best_param[key]
+            param=[value for key,value in full_param.items()]
+            alpha+=[param[0]]
+            ETRmax+=[param[1]]
+        alpha=np.mean(alpha)
+        ETRmax=np.mean(ETRmax)
+        if alpha<0.4 and ETRmax<150:
+            print("warning maybe pH stress")
+            time_since_stress+=1
+            if time_since_stress==10:
+                state=1
+                print("Decision : Stress PH --> regularizing the pH")
+            elif 50>time_since_stress>10:
+                pass
+            elif time_since_stress>50:
+                state=2
+                print("Decision: Acid pH stress happened, stopping the PAM")
+        elif (alpha>0.4 or ETRmax>150) and state!=0:
+            time_since_recover+=1
+            if time_since_recover>10:
+                state=0
+                maybe_state=0
+                time_since_recover=0
+        elif (alpha>0.4 or ETRmax>150) and state==0:
+            pass
+
+
+
     # if np.all(average_best_model == average_best_model[0]):
     #     #Extraire les paramètres et conclure en précisant bien que toutes les distances convergent vers le même modèle
     #     #Choisir la dist la plus petite pour le modèle
