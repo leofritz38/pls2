@@ -37,6 +37,24 @@ def Model6(E,param=["alpha","ETR"]):
     ETR=param[1]
     E = np.atleast_1d(E)
     return(alpha*E*np.exp(-((alpha*E)/(ETR*np.exp(1)))))
+
+def Model7(E,param=["alpha,"ETR_pot", "B"]) :
+    alpha=param[0]
+    ETR_pot=param[2]
+    B=param[3]
+    E = np.atleast_1d(E)
+    return(ETR_pot*(1-exp((alpha*E/ETR_pot)))*exp((B*E)/ETR_pot)
+
+def Model8(E,param=["alpha,"ETR", "E_opt"]) :
+    alpha=param[0]
+    ETR=param[2]
+    E_opt=param[3]
+    E = np.atleast_1d(E)
+    return(E/((1/(alpha*E_opt*E_opt))*E*E+((1/ETR)-(2/(alpha*E_opt))*E+1/alpha)
+
+
+
+
 # def Model7(E,alpha,ETR):
 #     return()
 # #def Model8(E,alpha,ETR):
