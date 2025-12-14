@@ -143,7 +143,7 @@ def get_best_prediction(dic):
 def generate_prior(parameter_name):
     prior_dic={"ETR":40,"alpha":0.2,"m":1}
     prior_list=[prior_dic[param] for param in parameter_name]
-    return prior_list          
+    return prior_list     
 # a=optimize_models(["Model1","Model2","Model3","Model4"],["least_square_distance","least_square_distance2","merge.least_square_distance.least_square_distance2"],models.Model6([0,1,2,3],[0.5,0.5]),[0.5,0.5])
 # print(a)
 # print(get_best_prediction(a))
