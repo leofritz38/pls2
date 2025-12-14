@@ -6,18 +6,6 @@ import numpy as np
 import pandas as pd
 
 
-def Simulate(data,models,distances,merge_dist=False,merge_only=False,ponderation=[0.5,0.5]):
-    if merge_dist and not(merge_only):
-        distances.append("merge."+".".join(distances))
-    if merge_only:
-        distances=["merge."+".".join(distances)]
-    # rawdata=data_loading.load(path)
-    raw_data=data
-    optimized_parameters=optimizer.optimize_models(models,distances,data,ponderation)
-    best_optimization_per_distance=optimizer.get_best_prediction(optimized_parameters)
-    average_best_model=[value[0] for key,value in best_optimization_per_distance.items()]
-    best_opt_param={",".join([key,value[0]]): optimized_parameters[value[0]][key]["optimized_parameters"] for key,value in best_optimization_per_distance.items()}
-    return best_opt_param,best_optimization_per_distance
 def decision_making(tmax,data,models,distances,merge_dist=False,merge_only=False,ponderation=[0.5,0.5]):
     state=0
     time_since_recover=0
