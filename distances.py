@@ -1,19 +1,30 @@
 import numpy as np
+import pandas as pd
 
 
 def least_square_distance_ETR(param,model,data):
     # current_mod=getattr(models,model)
-    x=data["PAR"]
-    y_ref=data["ETR"]
+    x = pd.to_numeric(data["PAR"], errors='coerce').to_numpy()
+    y_ref = pd.to_numeric(data["rETR"], errors='coerce').to_numpy()
     y_pred=model(x,param)
-    dist=(1/len(y_pred))*sum((y_ref-y_pred)**2)
+    # masque pour ignorer les NaN dans y_ref ou y_pred
+    mask = ~np.isnan(y_ref) & ~np.isnan(y_pred)
+
+    # distance moyenne quadratique
+    dist = np.sum((y_ref[mask] - y_pred[mask])**2) / mask.sum()
     return dist
 def least_square_distance_median(param,model,data):
     # current_mod=getattr(models,model)
-    x=data["PAR"]
-    y_ref=data["ETR"]
+    x = pd.to_numeric(data["PAR"], errors='coerce').to_numpy()
+    y_ref = pd.to_numeric(data["rETR"], errors='coerce').to_numpy()
     y_pred=model(x,param)
-    dist= np.median((y_ref - y_pred)**2)
+    mask = ~np.isnan(y_ref) & ~np.isnan(y_pred)
+
+    # carré des différences
+    squared_diff = (y_ref[mask] - y_pred[mask])**2
+
+    # médiane
+    dist = np.median(squared_diff)
     return dist
 def merge_distance(param,model,data,dist_to_merge,ponderation):
     if len(ponderation)!=len(dist_to_merge):
