@@ -1,6 +1,12 @@
 import numpy as np
 import pandas as pd
-
+####### distance structure type ######
+# take parm -> list of value for parameter in the model, model -> model name as str, data-> data without na as pd.dataframe
+# get x --> your vector of fixed parameter in the model
+# get y_ref --> observed data
+# simulate data under x and param
+# Calculate a distance that you want to minimize (if maximizing is wanted pls put - before)
+######################################
 
 def least_square_distance_ETR(param,model,data):
     # current_mod=getattr(models,model)
