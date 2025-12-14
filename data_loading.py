@@ -79,10 +79,11 @@ def create_fig(Path,data_proportion,model_used,dist,figname,merge_dist=False,mer
     return ("Done")
 # Définition des paramètres et execution de la fonction
 # La simulation peut être longue, il est recommandé de tester avec une seul distance et un seul modèle, voir de réduire la plage temporelle
-PATH="C:/Users/Nitro/Downloads/data/data/Online PAM/00_process_data/00_rlc_data/00_10s/01_pam3/data_PAM_LR_070_G1_MI5_MEA10_10s_PAM3.csv"
-dist=["least_square_distance_ETR"]
-model_used=["Model2","Model3","Model6"]
-figname="Pam3_10s_test_multi_mod"
-data_proportion=120001 
-### Warning : data_propotion modulo 10=1 étant donné la périodicité de nos données, sinon la dernière partie de la séquence ne sera pas traité
-create_fig(PATH,data_proportion,model_used,dist,figname)
+if __name__=="__main__":
+    PATH="C:/Users/Nitro/Downloads/data/data/Online PAM/00_process_data/00_rlc_data/00_10s/01_pam3/data_PAM_LR_070_G1_MI5_MEA10_10s_PAM3.csv"
+    dist=["least_square_distance_ETR"]
+    model_used=["Model2","Model3","Model6"]
+    figname="Pam3_10s_test_multi_mod"
+    data_proportion=120001 
+    ### Warning : data_propotion modulo 10=1 étant donné la périodicité de nos données, sinon la dernière partie de la séquence ne sera pas traité
+    create_fig(PATH,data_proportion,model_used,dist,figname)
