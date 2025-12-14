@@ -1,42 +1,18 @@
+#### Ce fichier contient toutes les fonctions nécessaires à une optimisation
+
 import models
-# import data_loading
 from scipy.optimize import minimize
 import numpy as np
 import inspect
 import types
 import distances
-### Deprecated
-# def extract_models_parameters(modname):
-#     if isinstance(modname,list):
-#         multi_mod_param={}
-#         for single_model in modname:
-#             multi_mod_param[single_model]=extract_models_parameters(single_model)
-#         return(multi_mod_param)
-#     elif isinstance(modname,str):
-#         mod_param={}
-#         try:
-#             current_mod = getattr(models, modname)
-#             list_param=inspect.signature(current_mod)
-#             for param_name, param in list_param.parameters.items():
-#                 if param_name=="E":
-#                     try:
-#                         mod_param["fixed"].append(param_name)
-#                     except:
-#                         mod_param["fixed"]=[param_name]
-#                 else:
-#                     try:
-#                         mod_param["to_opt"].append(param_name)
-#                     except:
-#                         mod_param["to_opt"]=[param_name]
-#             if len(mod_param["fixed"])==0:
-#                 raise ValueError("E must be a parameter of the model")
-#             return(mod_param)
-#         except:
-#             raise ValueError("model name not defined")
-#     else:
-#         raise TypeError("please enter either a str, a list or a self_define model of str as model to extract parameters from")
+
 
 def optimize_models(modname,dist,rawdata,ponderation):
+    ##############################
+    # Cette fonction exécutent l'optimisations de toutes les combinaisons modèle distance fourni en entrée
+    # les sorties s'organisent de la façon suivant : {Modele:{Dist1:{param:{},distvalue:float}}}
+    ##############################
     # Premier cas de figure, plusieurs modèles qui tournent
     if isinstance(modname,list):
         # On execute la fonction sur chaque modèle individuel puis on stock le tout dans un dico de la strcture suivante :
@@ -111,6 +87,10 @@ def optimize_models(modname,dist,rawdata,ponderation):
 
 
 def flatten_dist(dic,path=None):
+    #######################
+    # Cette fonction applatti les sorties de optimize (arbre) en un dictionnaire structuré comme tel:
+    # {'distname,modelname':{'param':{'alpha':value,..},'dist':value}}
+    #######################
     flatten={}
     if path==None:
         path=[]
@@ -126,6 +106,10 @@ def flatten_dist(dic,path=None):
     return(flatten)
 
 def get_best_prediction(dic):
+    #####################
+    # Cette fonction renvoie le modèle dont l'optimisation a renvoyé la plus petite distance
+    # Elle prend en entrée la sortie de la fonction optimize
+    ####################
     dic=flatten_dist(dic)
     best_prediction_per_distance={}
     for key,value in dic.items():
@@ -140,9 +124,41 @@ def get_best_prediction(dic):
         
 
 def generate_prior(parameter_name):
+    #####################
+    # Cette fonction à pour objectif de fixer les valeurs initiales des paramètres à l'initialisation
+    # Attention de bien modifier le prior_dic en cas d'ajout d'un modèle contenant des paramètres n'étant pas déjà dans ce dernier
+    ####################
     prior_dic={"ETR":40,"alpha":0.2,"m":1}
-    prior_list=[prior_dic[param] for param in parameter_name]
-    return prior_list     
+    try:
+        prior_list=[prior_dic[param] for param in parameter_name]
+    except:
+        raise ValueError("Prior(s) de paramètres non défini(s)")
+    return prior_list
+
+def Simulate(data,models,distances,merge_dist=False,merge_only=False,ponderation=[0.5,0.5]):
+    ######################
+    # Cette fonction est utilisée comme finalité à toutes les fonctions de ce fichier.
+    # Elle prend en entrée les données sous forme de data frame pandas, les modeles sous forme de liste de str,
+    # les distances sous forme de liste de distance, la validité de la distance fusionnée, l'unicité de la distance fusionnée
+    # et la pondération entre les distances fusionnées
+    ######################
+    raw_data=data
+    # On ajoute ou remplace aux distances la distance fusionnée 
+    if merge_dist and not(merge_only):
+        distances.append("merge."+".".join(distances))
+    if merge_only:
+        distances=["merge."+".".join(distances)]
+    # rawdata=data_loading.load(path)
+    # Réalisation de l'optimisation
+    optimized_parameters=optimize_models(models,distances,data,ponderation)
+    # On récupère la meilleure optimisation pour chaque distance
+    best_optimization_per_distance=get_best_prediction(optimized_parameters)
+    # On récupère le meilleur modèle pour chaque distance
+    average_best_model=[value[0] for key,value in best_optimization_per_distance.items()]
+    # On récupère les paramètres pour chaque distance
+    best_opt_param={",".join([key,value[0]]): optimized_parameters[value[0]][key]["optimized_parameters"] for key,value in best_optimization_per_distance.items()}
+    # On renvoie les meilleurs optimisations et les meilleurs paramètres
+    return best_opt_param,best_optimization_per_distance
 # a=optimize_models(["Model1","Model2","Model3","Model4"],["least_square_distance","least_square_distance2","merge.least_square_distance.least_square_distance2"],models.Model6([0,1,2,3],[0.5,0.5]),[0.5,0.5])
 # print(a)
 # print(get_best_prediction(a))
