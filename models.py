@@ -52,7 +52,12 @@ def Model8(E,param=["alpha,"ETR", "E_opt"]) :
     E = np.atleast_1d(E)
     return(E/((1/(alpha*E_opt*E_opt))*E*E+((1/ETR)-(2/(alpha*E_opt))*E+1/alpha)
 
-
+def Model9(E,param=["alpha,"K1", "E_opt"]) :
+    alpha=param[0]
+    K1=param[2]
+    E_opt=param[3]
+    E = np.atleast_1d(E)
+    return((E_opt*E*exp(E/K1))/((E_opt/alpha)+E))
 
 
 # def Model7(E,alpha,ETR):
