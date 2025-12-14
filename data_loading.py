@@ -1,10 +1,10 @@
-
+#### Ce fichier n'est pas généralisable en cas de changement de référentiel (nécessite E et rETR en valeur de x et y_ref) mais peu servir de référence pour généralisation
 import pandas as pd
 import numpy as np  
-import decision_making
 from sys import argv
 import matplotlib.pyplot as plt
 import models
+import optimizer
 
 # print("data need to be extracted fom file.zip in order ot be readen by read_csv")
 # print(" give the data_file pathway with / not \ ")
@@ -25,9 +25,9 @@ def create_fig(Path,data_proportion,model_used,dist,figname,merge_dist=False,mer
     df.replace("-", np.nan, inplace=True)
     # Sécurité 
     df["PAR"] = pd.to_numeric(df["PAR"], errors='coerce')
-    df["ETR"] = pd.to_numeric(df["ETR"], errors='coerce')
+    df["rETR"] = pd.to_numeric(df["rETR"], errors='coerce')
     # On enlève tous les Nas
-    df_clean = df.dropna(subset=["PAR","ETR"])
+    df_clean = df.dropna(subset=["PAR","ETR","rETR"])
     # Initialisation des séquences de résultats
     alpha={i:[] for i in dist}
     ETRmax={i:[] for i in dist}
@@ -39,7 +39,7 @@ def create_fig(Path,data_proportion,model_used,dist,figname,merge_dist=False,mer
     # Parcours de la séquence temporelle
     for i in time_seq:
         # Optimisation des paramètres sur la séquences donné, récupération du meilleur modèle
-        best_param,bestmodel=decision_making.Simulate(df.iloc[i-10:i],model_used,dist,merge_dist=merge_dist,merge_only=merge_only,ponderation=ponderation)
+        best_param,bestmodel=optimizer.Simulate(df.iloc[i-10:i],model_used,dist,merge_dist=merge_dist,merge_only=merge_only,ponderation=ponderation)
         # Récupération des chemins (ici pas nécessaire car on utilise finalement qu'une seule fonction)
         paths=[[key,value[0]] for key,value in bestmodel.items()]
         # On parcours les différentes distances (toujours un modèle par distance)
@@ -80,8 +80,8 @@ def create_fig(Path,data_proportion,model_used,dist,figname,merge_dist=False,mer
 # Définition des paramètres et execution de la fonction
 PATH="C:/Users/Nitro/Downloads/data/data/Online PAM/00_process_data/00_rlc_data/00_10s/01_pam3/data_PAM_LR_070_G1_MI5_MEA10_10s_PAM3.csv"
 dist=["least_square_distance_ETR"]
-model_used=["Model2"]
-figname="Pam3_10s "
+model_used=["Model2","Model3","Model6"]
+figname="Pam3_10s_test_multi_mod"
 data_proportion=120001 
 ### Warning : data_propotion modulo 10=1 étant donné la périodicité de nos données, sinon la dernière partie de la séquence ne sera pas traité
 create_fig(PATH,data_proportion,model_used,dist,figname)
